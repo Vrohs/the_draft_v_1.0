@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-cream: #FDFBF7;
+  --color-ink: #1a1a1a;
+  --color-night: #0d0d0d;
+  --color-phosphor: #33ff00;
+
+  --font-courier: var(--font-courier-prime), "Courier New", Courier, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Custom Utilities */
+@layer utilities {
+  .text-ink-bleed {
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.4), 0px 0px 2px rgba(0, 0, 0, 0.05);
   }
 }
 
+@layer components {
+  .sp-slugline {
+    @apply uppercase font-bold mb-4 ml-0;
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.4), 0px 0px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .sp-action {
+    @apply mb-4 ml-0;
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.4), 0px 0px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .sp-character {
+    @apply uppercase mb-0 ml-[40%];
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.4), 0px 0px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .sp-dialogue {
+    @apply mb-4 mx-[20%];
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.4), 0px 0px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .sp-parenthetical {
+    @apply lowercase mb-0 ml-[30%];
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.4), 0px 0px 2px rgba(0, 0, 0, 0.05);
+  }
+
+  .sp-transition {
+    @apply uppercase mb-4 ml-[70%] text-right;
+    text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.4), 0px 0px 2px rgba(0, 0, 0, 0.05);
+    /* PRD says ml-80% but typically transitions are right aligned. PRD says ml-80% for Right Align. */
+  }
+}
+
+@media print {
+  @page {
+    size: letter;
+    margin: 1in;
+  }
+
+  body {
+    background-color: white !important;
+    color: black !important;
+  }
+
+  .text-ink-bleed,
+  .sp-slugline,
+  .sp-action,
+  .sp-character,
+  .sp-dialogue,
+  .sp-parenthetical,
+  .sp-transition {
+    text-shadow: none !important;
+  }
+
+  /* Hide UI */
+  .fixed,
+  header,
+  nav,
+  aside {
+    display: none !important;
+  }
+
+  /* Reset editor width */
+  .prose {
+    max-width: none !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+}
+
+/* Force Courier Prime everywhere inside editor to override prose defaults */
+.prose,
+.prose * {
+  font-family: var(--font-courier) !important;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-courier);
 }
