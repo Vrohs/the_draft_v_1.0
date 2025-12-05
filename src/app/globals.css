@@ -6,6 +6,7 @@
   --color-night: #0d0d0d;
   --color-phosphor: #33ff00;
 
+  /* Use the exact variable name defined in layout.tsx */
   --font-courier: var(--font-courier-prime), "Courier New", Courier, monospace;
 }
 
@@ -89,7 +90,7 @@
 /* Force Courier Prime everywhere inside editor to override prose defaults */
 .prose,
 .prose * {
-  font-family: var(--font-courier) !important;
+  font-family: var(--font-courier-prime), "Courier New", Courier, monospace !important;
 }
 
 body {

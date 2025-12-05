@@ -1,31 +1,13 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Courier_Prime } from "next/font/google";
 import "./globals.css";
 
-const courierPrime = localFont({
-  src: [
-    {
-      path: "./fonts/CourierPrime-Regular.ttf",
-      weight: "400",
-      style: "normal",
-    },
-    {
-      path: "./fonts/CourierPrime-Italic.ttf",
-      weight: "400",
-      style: "italic",
-    },
-    {
-      path: "./fonts/CourierPrime-Bold.ttf",
-      weight: "700",
-      style: "normal",
-    },
-    {
-      path: "./fonts/CourierPrime-BoldItalic.ttf",
-      weight: "700",
-      style: "italic",
-    },
-  ],
+const courierPrime = Courier_Prime({
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
   variable: "--font-courier-prime",
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
