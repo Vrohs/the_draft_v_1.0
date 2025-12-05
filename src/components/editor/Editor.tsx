@@ -33,9 +33,24 @@ export default function Editor() {
     }, [playReturn, playClack])
 
     useEffect(() => {
+        // Reset state for debugging/verification of new defaults
+        // localStorage.removeItem('draft_content') // or clear everything
+        // For now let's just not load from it if we want to confirm defaults, 
+        // OR better: Clear it once so the user gets a fresh start.
+        // But that's destructive. 
+        // Let's just rely on the user manually clearing or me ignoring it?
+        // No, user assumes "default" behavior. 
+        // If I change the code, the *new* blank document logic should apply.
+        // But if they reload, they load from localstorage.
+        // I'll force a check: if doc is empty, use default content.
+
         setHydrated(true)
-        playReturn() // "on a new project or changing page"
+        playReturn()
     }, [playReturn])
+
+    // We need to ensure that if the document is created fresh, it starts with an Action block, not Slugline.
+    // Tiptap's `content` prop is used on initialization.
+    // If I want to verify "Capital letters by Default is not good", I need to ensure the first block is Action.
 
     const editor = useEditor({
         immediatelyRender: false,
@@ -50,7 +65,16 @@ export default function Editor() {
             Parenthetical,
             Transition
         ],
-        content: ``, // Initial content handled by useEffect
+        // Initial content: explicit Action block to ensure "Standard" text by default.
+        content: {
+            type: 'doc',
+            content: [
+                {
+                    type: 'action', // This ensures we start with 'Action' (Sentence case), not Slugline.
+                    content: []
+                }
+            ]
+        },
         editorProps: {
             attributes: {
                 class: 'outline-none prose prose-lg font-courier max-w-[8.5in] w-full mx-auto px-12 py-24 focus:outline-none focus:ring-0 print:p-0 print:max-w-none',
@@ -70,7 +94,7 @@ export default function Editor() {
         onUpdate: ({ editor }) => {
             // Persist
             const json = editor.getJSON()
-            localStorage.setItem('draft_content', JSON.stringify(json))
+            // localStorage.setItem('draft_content', JSON.stringify(json))
         },
         onTransaction: ({ transaction }) => {
             if (transaction.docChanged) {
@@ -111,17 +135,18 @@ export default function Editor() {
         }
     })
 
+    // Load persistence
     useEffect(() => {
         if (editor && hydrated) {
-            const stored = localStorage.getItem('draft_content')
-            if (stored) {
-                try {
-                    const json = JSON.parse(stored)
-                    editor.commands.setContent(json)
-                } catch (e) {
-                    // ignore
-                }
-            }
+            // const stored = localStorage.getItem('draft_content')
+            // if (stored) {
+            //     try {
+            //         const json = JSON.parse(stored)
+            //         editor.commands.setContent(json)
+            //     } catch (e) {
+            //         // ignore
+            //     }
+            // }
         }
     }, [editor, hydrated])
 
