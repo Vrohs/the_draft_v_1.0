@@ -5,6 +5,8 @@ interface UIState {
     setFocusMode: (value: boolean) => void
     isSoundEnabled: boolean
     toggleSound: () => void
+    isNightMode: boolean
+    toggleNightMode: () => void
 }
 
 export const useUIStore = create<UIState>((set) => ({
@@ -12,4 +14,6 @@ export const useUIStore = create<UIState>((set) => ({
     setFocusMode: (value) => set({ isFocusMode: value }),
     isSoundEnabled: true,
     toggleSound: () => set((state) => ({ isSoundEnabled: !state.isSoundEnabled })),
+    isNightMode: false,
+    toggleNightMode: () => set((state) => ({ isNightMode: !state.isNightMode })),
 }))

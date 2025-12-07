@@ -3,6 +3,8 @@ import { Node, mergeAttributes } from "@tiptap/core";
 export const Action = Node.create({
     name: "action",
 
+    priority: 2000, // Highest priority to ensure it's the default block
+
     group: "block",
 
     content: "text*",

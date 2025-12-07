@@ -3,6 +3,8 @@ import { Node, mergeAttributes } from "@tiptap/core";
 export const Character = Node.create({
     name: "character",
 
+    priority: 1000,
+
     group: "block",
 
     content: "text*",
@@ -24,10 +26,18 @@ export const Character = Node.create({
     addKeyboardShortcuts() {
         return {
             Enter: () => {
-                return this.editor.commands.insertContentAt(
-                    this.editor.state.selection.to,
-                    { type: 'dialogue', content: [] }
-                );
+                if (!this.editor.isActive('character')) return false
+
+                const { selection } = this.editor.state;
+                const { $from, empty } = selection;
+
+                if (!empty) return false;
+
+                if ($from.parentOffset === $from.parent.content.size) {
+                    return this.editor.commands.insertContent({ type: 'dialogue' });
+                }
+
+                return false;
             },
             Tab: () => {
                 // Maybe Tab moves back to Action? Or Transition?

@@ -6,7 +6,7 @@ import { useAudio } from '@/hooks/useAudio'
 
 export const Sidebar = ({ editor }: { editor: Editor | null }) => {
     const scenes = useScenes(editor)
-    const { isFocusMode, isSoundEnabled, toggleSound } = useUIStore()
+    const { isFocusMode, isSoundEnabled, toggleSound, isNightMode, toggleNightMode } = useUIStore()
     const { playReturn } = useAudio()
 
     const handlePDF = () => {
@@ -68,6 +68,9 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
             <div className="border-t border-ink/10 pt-6 space-y-4">
                 <button onClick={toggleSound} className="text-xs font-bold text-ink/50 hover:text-ink uppercase flex items-center gap-2">
                     {isSoundEnabled ? 'Sound: On' : 'Sound: Muted'}
+                </button>
+                <button onClick={toggleNightMode} className="text-xs font-bold text-ink/50 hover:text-ink uppercase flex items-center gap-2">
+                    {isNightMode ? 'Mode: Night' : 'Mode: Day'}
                 </button>
                 <button onClick={handlePDF} className="text-xs font-bold text-ink/50 hover:text-ink uppercase flex items-center gap-2">
                     Export PDF

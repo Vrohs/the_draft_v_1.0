@@ -15,6 +15,11 @@
   .text-ink-bleed {
     text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.4), 0px 0px 2px rgba(0, 0, 0, 0.05);
   }
+
+  /* Night Mode Glow instead of bleed */
+  body.night-mode .text-ink-bleed {
+    text-shadow: 0px 0px 5px rgba(51, 255, 0, 0.5), 0px 0px 2px rgba(51, 255, 0, 0.3);
+  }
 }
 
 @layer components {
@@ -97,4 +102,48 @@ body {
   background-color: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-courier);
+  transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+body.night-mode {
+  --color-ink: var(--color-phosphor);
+  --color-cream: var(--color-night);
+  background-color: var(--color-cream);
+  /* Uses the remapped value (#0d0d0d) */
+  /* Uses the remapped value (#33ff00) */
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(26, 26, 26, 0.2);
+  /* color-ink with opacity */
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(26, 26, 26, 0.4);
+}
+
+body.night-mode ::-webkit-scrollbar-thumb {
+  background: rgba(51, 255, 0, 0.2);
+  /* color-phosphor with opacity */
+}
+
+body.night-mode ::-webkit-scrollbar-thumb:hover {
+  background: rgba(51, 255, 0, 0.4);
+}
+
+/* Override selection color in night mode */
+body.night-mode *::selection {
+  background-color: rgba(51, 255, 0, 0.2);
+  /* Phosphor with opacity */
+  color: var(--color-phosphor);
 }

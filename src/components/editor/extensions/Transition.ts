@@ -3,6 +3,8 @@ import { Node, mergeAttributes } from "@tiptap/core";
 export const Transition = Node.create({
     name: "transition",
 
+    priority: 1000,
+
     group: "block",
 
     content: "text*",
@@ -24,11 +26,18 @@ export const Transition = Node.create({
     addKeyboardShortcuts() {
         return {
             Enter: () => {
-                // Transition -> Slugline (Usually)
-                return this.editor.commands.insertContentAt(
-                    this.editor.state.selection.to,
-                    { type: 'slugline', content: [] }
-                );
+                if (!this.editor.isActive('transition')) return false
+
+                const { selection } = this.editor.state;
+                const { $from, empty } = selection;
+
+                if (!empty) return false;
+
+                if ($from.parentOffset === $from.parent.content.size) {
+                    return this.editor.commands.insertContent({ type: 'slugline' });
+                }
+
+                return false;
             },
         };
     },

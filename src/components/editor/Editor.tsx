@@ -17,7 +17,7 @@ import { Sidebar } from '../ui/Sidebar'
 import { useAudio } from '@/hooks/useAudio'
 
 export default function Editor() {
-    const { setFocusMode } = useUIStore()
+    const { setFocusMode, isNightMode } = useUIStore()
     const { playClack, playReturn } = useAudio()
     const timeoutRef = useRef<NodeJS.Timeout | null>(null)
     const [hydrated, setHydrated] = useState(false)
@@ -27,23 +27,21 @@ export default function Editor() {
     const playClackRef = useRef(playClack)
     const isEnterRef = useRef(false)
 
+    // Toggle Night Mode class
+    useEffect(() => {
+        if (isNightMode) {
+            document.body.classList.add('night-mode')
+        } else {
+            document.body.classList.remove('night-mode')
+        }
+    }, [isNightMode])
+
     useEffect(() => {
         playReturnRef.current = playReturn
         playClackRef.current = playClack
     }, [playReturn, playClack])
 
     useEffect(() => {
-        // Reset state for debugging/verification of new defaults
-        // localStorage.removeItem('draft_content') // or clear everything
-        // For now let's just not load from it if we want to confirm defaults, 
-        // OR better: Clear it once so the user gets a fresh start.
-        // But that's destructive. 
-        // Let's just rely on the user manually clearing or me ignoring it?
-        // No, user assumes "default" behavior. 
-        // If I change the code, the *new* blank document logic should apply.
-        // But if they reload, they load from localstorage.
-        // I'll force a check: if doc is empty, use default content.
-
         setHydrated(true)
         playReturn()
     }, [playReturn])
@@ -94,7 +92,9 @@ export default function Editor() {
         onUpdate: ({ editor }) => {
             // Persist
             const json = editor.getJSON()
-            // localStorage.setItem('draft_content', JSON.stringify(json))
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('draft_content', JSON.stringify(json))
+            }
         },
         onTransaction: ({ transaction }) => {
             if (transaction.docChanged) {
@@ -138,15 +138,23 @@ export default function Editor() {
     // Load persistence
     useEffect(() => {
         if (editor && hydrated) {
-            // const stored = localStorage.getItem('draft_content')
-            // if (stored) {
-            //     try {
-            //         const json = JSON.parse(stored)
-            //         editor.commands.setContent(json)
-            //     } catch (e) {
-            //         // ignore
-            //     }
-            // }
+            const stored = localStorage.getItem('draft_content')
+            if (stored) {
+                try {
+                    const json = JSON.parse(stored)
+                    // If stored content is empty or invalid, keep default.
+                    // But check if it has content.
+                    editor.commands.setContent(json)
+                    // We set content but we don't want to trigger the sound.
+                    // Actually, `setContent` triggers a transaction.
+                    // We can't easily pass meta to `setContent` in all Tiptap versions directly as a second arg object?
+                    // Correction: editor.commands.setContent(content, emitUpdate, parseOptions) - doesn't take meta.
+                    // Better approach: Use chain().setContent(json).setMeta('preventSound', true).run()
+                    editor.chain().setContent(json).setMeta('preventSound', true).run()
+                } catch (e) {
+                    // ignore
+                }
+            }
         }
     }, [editor, hydrated])
 

@@ -3,6 +3,8 @@ import { Node, mergeAttributes } from "@tiptap/core";
 export const Parenthetical = Node.create({
     name: "parenthetical",
 
+    priority: 1000,
+
     group: "block",
 
     content: "text*",
@@ -24,11 +26,18 @@ export const Parenthetical = Node.create({
     addKeyboardShortcuts() {
         return {
             Enter: () => {
-                // Parenthetical always leads back to Dialogue
-                return this.editor.commands.insertContentAt(
-                    this.editor.state.selection.to,
-                    { type: 'dialogue', content: [] }
-                );
+                if (!this.editor.isActive('parenthetical')) return false
+
+                const { selection } = this.editor.state;
+                const { $from, empty } = selection;
+
+                if (!empty) return false;
+
+                if ($from.parentOffset === $from.parent.content.size) {
+                    return this.editor.commands.insertContent({ type: 'dialogue' });
+                }
+
+                return false;
             },
         };
     },

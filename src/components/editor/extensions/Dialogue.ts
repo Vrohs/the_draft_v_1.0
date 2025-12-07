@@ -3,6 +3,8 @@ import { Node, mergeAttributes } from "@tiptap/core";
 export const Dialogue = Node.create({
     name: "dialogue",
 
+    priority: 1000,
+
     group: "block",
 
     content: "text*",
@@ -20,25 +22,21 @@ export const Dialogue = Node.create({
     addKeyboardShortcuts() {
         return {
             Enter: () => {
+                if (!this.editor.isActive('dialogue')) return false
+
                 const { selection } = this.editor.state;
-                const { empty, $from } = selection;
+                const { $from, empty } = selection;
 
                 if (!empty) return false;
 
-                // If the dialogue block is empty (user hit enter immediately after creating it, or deleted text)
-                const isNodeEmpty = $from.parent.content.size === 0;
-
-                if (isNodeEmpty) {
-                    // Transform current empty dialogue to Action
-                    return this.editor.commands.setNode("action");
+                // If empty dialogue (Double Enter), change to Action
+                if ($from.parent.content.size === 0) {
+                    return this.editor.commands.setNode('action');
                 }
 
-                // If at the end of the line, create a new Character block (Alternating)
+                // If at end of line, create Character (Alternating)
                 if ($from.parentOffset === $from.parent.content.size) {
-                    return this.editor.commands.insertContentAt(
-                        this.editor.state.selection.to,
-                        { type: 'character', content: [] }
-                    );
+                    return this.editor.commands.insertContent({ type: 'character' });
                 }
 
                 return false;
