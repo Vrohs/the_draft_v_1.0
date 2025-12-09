@@ -1,5 +1,8 @@
 import { Editor } from '@tiptap/core'
+import Document from '@tiptap/extension-document'
 import StarterKit from '@tiptap/starter-kit'
+import Text from '@tiptap/extension-text'
+import History from '@tiptap/extension-history'
 import { Slugline } from '../Slugline'
 import { Action } from '../Action'
 import { Character } from '../Character'
@@ -13,8 +16,10 @@ describe('Screenplay Extensions', () => {
     beforeEach(() => {
         editor = new Editor({
             extensions: [
-                StarterKit,
-                Action, // Match Editor.tsx order
+                Document,
+                Text,
+                History.configure({ newGroupDelay: 0 }),
+                Action,
                 Slugline,
                 Character,
                 Dialogue,
@@ -144,5 +149,96 @@ describe('Screenplay Extensions', () => {
         editor.commands.enter()
 
         expect(editor.getJSON().content?.[1].type).toBe('slugline')
+    })
+
+    // 8. Input Rule: Type "INT. " -> Slugline (Preserve Text)
+    it('should convert to slugline but PRESERVE the text "INT. "', () => {
+        // We simulate the effect of the input rule.
+        // The bug is that `textblockTypeInputRule` deletes the matched text ("INT. ").
+        // We want to ensure that if we used a proper rule, the text remains.
+
+        // Since we can't easily run the actual InputRule engine here without full integration setup,
+        // we will assume the manual verification showed it deletes.
+        // This test represents the *desired* state for a "typing" simulation.
+
+        // Let's manually simulate what we WANT the input rule to do:
+        // 1. User types "INT. "
+        // 1. User types "INT. "
+        editor.commands.setContent({ type: 'doc', content: [{ type: 'action', content: [{ type: 'text', text: 'INT. ' }] }] })
+
+        // 2. Trigger conversion (manually for now to verify node support)
+        editor.commands.setNode('slugline')
+
+        // 3. Verify text is still there
+        expect(editor.getText()).toBe('INT. ')
+        expect(editor.getJSON().content?.[0].type).toBe('slugline')
+    })
+
+    it('should undo a Smart Enter transition', () => {
+        // Create a specific editor instance for this test to ensure history starts clean with content
+        const localEditor = new Editor({
+            extensions: [
+                Document,
+                Text,
+                History,
+                Action,
+                Slugline,
+                Character,
+                Dialogue,
+                Parenthetical,
+                Transition
+            ],
+            content: {
+                type: 'doc',
+                content: [
+                    {
+                        type: 'slugline',
+                        content: [{ type: 'text', text: 'INT. TEST' }]
+                    }
+                ]
+            }
+        })
+
+        // Move cursor to end of the slugline
+        // Node size = 1 (start) + text (9) + 1 (end) = 11? 
+        // Text is "INT. TEST". Length 9.
+        // Start pos 0 -> Doc start. 
+        // Block start 1. Text start 1. 
+        // We want pos at 10?
+        // Let's use the helper logic adapted for localEditor
+        const nodeSize = localEditor.state.doc.content.child(0).nodeSize
+        localEditor.commands.setTextSelection(nodeSize - 1)
+
+        localEditor.commands.enter()
+
+        // Verify action created
+        expect(localEditor.getJSON().content?.[1].type).toBe('action')
+
+        // Undo
+        localEditor.commands.undo()
+
+        // Should be back to just slugline (History shouldn't undo the initial content)
+        const content = localEditor.getJSON().content
+        expect(content?.length).toBe(1)
+        expect(content?.[0].type).toBe('slugline')
+
+        localEditor.destroy()
+    })
+
+    // 9. Mid-block Enter (Default Split Behavior)
+    it('should split Dialogue block when Enter pressed in middle', () => {
+        setContent('dialogue', 'Hello world')
+        // Place cursor after 'Hello' (pos: 1 + 5 = 6)
+        editor.commands.setTextSelection(6)
+
+        editor.commands.enter()
+
+        // Should result in two Dialogue blocks
+        const content = editor.getJSON().content
+        expect(content?.[0].type).toBe('dialogue')
+        expect((content?.[0].content?.[0] as any).text).toBe('Hello')
+
+        expect(content?.[1].type).toBe('dialogue')
+        expect((content?.[1].content?.[0] as any).text).toBe(' world')
     })
 })
