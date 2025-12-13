@@ -1,36 +1,34 @@
-The Draft A focused, writer-first screenwriting workspace for drafting, organizing, and sharing scripts.
+🎬 The Draft — Write. Shape. Ship.
+A writer-first screenwriting workspace that helps storytellers move from idea to camera-ready draft with speed, clarity, and creative control.
 
-What The Draft is The Draft is a cloud-first screenwriting tool built to help writers turn ideas into polished drafts quickly. It focuses on editing ergonomics, clear versioning, and lightweight collaboration — without the noise of bloated feature lists.
+The Draft is built for people who write: screenwriters, playwrights, showrunners, and creative teams who want an intuitive, distraction-free editor plus the tools to plan, collaborate, and deliver polished scripts — without wrestling with layout or feature bloat.
 
-Key features
+Why The Draft?
+Designed around writing flow, not menus. Type naturally and let the editor do the formatting.
+Keeps ideas organized: outlines, index cards, and scene management live alongside your draft.
+Collaboration that respects the craft: live co-writing, threaded notes, and clear revision history.
+Export when you’re ready: industry-standard formats for production, tables reads, and submissions.
+Mobile-friendly and focused — write anytime, anywhere, with an interface that gets out of your way.
+What it does for you
+Speeds up early drafting by removing friction and interruptions.
+Makes collaboration productive: see who changed what, leave precise feedback, and resolve notes without losing context.
+Preserves your creative process: named drafts, snapshots, and diff views mean you can experiment safely.
+Helps you prep for production: scene breakdowns, character & location sheets, and export-ready scripts.
+Core Features
+Intelligent auto-formatting for scene headings, character cues, dialogue, parentheticals, and transitions.
+Minimal, distraction-free editor with focus modes and customizable type settings.
+Live collaboration with presence indicators, per-user cursors, and comment threads.
+Scene cards & drag-to-reorder outline for visual story structuring.
+Character and location profiles with notes and image attachments.
+Named drafts, snapshot history, and one-click restores.
+Exports: clean PDF, Fountain, Final Draft (.fdx), and plain text.
+Responsive design for laptop, tablet, and mobile workflows.
+Secure cloud storage and optional offline-first editing (syncs when online).
+Who it's for
+Solo writers who want a faster way to draft and revise.
+Writing teams and writers’ rooms that need real-time collaboration without the noise.
+Producers and editors who want clear revision tracking and focused feedback tools.
+Schools and workshops that need a simple, consistent writing environment for students.
+The Draft experience (in plain terms)
+Open the editor and the interface guides you — it recognizes scene headings and dialogue as you type, so you never have to think about margins or layout. Build an outline with cards you can reorder, then jump back into the draft at any scene. Invite a collaborator; track suggestions as named drafts and compare two versions side by side. When it’s ready, export a submission-grade PDF or an .fdx file for the reading table.
 
-Natural auto-formatting: recognizes scene headings (INT./EXT.), character names, dialogue, parentheticals, and common transitions as you type.
-Live collaboration: multiple writers can edit the same script with cursors, comments, and per-scene discussion threads.
-Version history & named drafts: save snapshots, compare revisions, and restore earlier drafts.
-Outline & index cards: build a scene-by-scene outline, drag to reorder, and jump straight to the scene in the editor.
-Exports: generate PDF, Fountain, and Final Draft (.fdx) files for submissions or table reads.
-Offline-friendly editor: continue writing when your connection drops — changes sync when you’re back online.
-Why this README is different This copy focuses on concrete capabilities and day-to-day benefits for writers instead of vague, hypey claims. It’s written to be honest about what The Draft does and how it helps.
-
-Quickstart (placeholder commands — replace with your actual scripts) Prerequisites
-
-Node.js 18+ (or the version you use)
-Yarn / npm / pnpm (choose one)
-An account or API keys if a hosted backend is required
-Clone and run locally
-
-git clone https://github.com/Vrohs/the_draft_v_1.0.git
-cd the_draft_v_1.0
-cp .env.example .env # populate with your keys
-npm install
-npm run dev # or yarn dev / pnpm dev
-Open http://localhost:3000
-Build for production
-
-npm run build
-npm start
-Contributing We welcome contributions. Please:
-
-Open an issue first for non-trivial changes or feature proposals.
-Follow the code style (ESLint, Prettier — add configs if needed).
-Make changes on feature branches and open a pull request with a clear description and testing steps.
