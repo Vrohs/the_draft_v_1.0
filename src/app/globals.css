@@ -105,6 +105,24 @@ body {
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
+/* Title Page Styles */
+.print-title-page {
+  display: none;
+}
+
+@media print {
+  .print-title-page {
+    display: flex !important;
+    height: 100vh;
+    width: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    page-break-after: always;
+  }
+}
+
 body.night-mode {
   --color-ink: var(--color-phosphor);
   --color-cream: var(--color-night);

@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import Editor from "@/components/editor/Editor";
 
 export default function Home() {

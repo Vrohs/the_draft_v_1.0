@@ -12,8 +12,43 @@ jest.mock('@/hooks/useAudio', () => ({
 jest.mock('@/store/useUIStore', () => ({
     useUIStore: () => ({
         setFocusMode: jest.fn(),
-        isFocusMode: false
+        isFocusMode: false,
+        isInFocusMode: false,
+        isNightMode: false,
+        setIsNightMode: jest.fn(),
+        currentScriptId: null,
+        setCurrentScriptId: jest.fn(),
+        setScriptTitle: jest.fn(),
+        setScriptAuthor: jest.fn(),
+        scriptTitle: 'Untitled',
+        scriptAuthor: 'Author'
     })
+}))
+
+// Mock useLiveQuery
+jest.mock('dexie-react-hooks', () => ({
+    useLiveQuery: jest.fn()
+}))
+
+jest.mock('@/lib/db', () => ({
+    db: {
+        scripts: {
+            count: jest.fn().mockResolvedValue(0),
+            add: jest.fn().mockResolvedValue(1),
+            orderBy: jest.fn().mockReturnThis(),
+            reverse: jest.fn().mockReturnThis(),
+            last: jest.fn().mockResolvedValue(null),
+            get: jest.fn().mockResolvedValue(null),
+            update: jest.fn().mockResolvedValue(1),
+            delete: jest.fn().mockResolvedValue(1),
+            toArray: jest.fn().mockResolvedValue([])
+        }
+    }
+}))
+
+// Mock useAutosave
+jest.mock('@/hooks/useAutosave', () => ({
+    useAutosave: jest.fn()
 }))
 
 // Mock Sidebar
@@ -34,7 +69,7 @@ jest.mock('@tiptap/react', () => ({
 describe('Editor Component', () => {
     const playClack = jest.fn()
     const playReturn = jest.fn()
-    const playSlide = jest.fn()
+
 
     // Mock editor instance
     const mockEditor = {

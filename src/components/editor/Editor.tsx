@@ -10,17 +10,19 @@ import { Character } from './extensions/Character'
 import { Dialogue } from './extensions/Dialogue'
 import { Parenthetical } from './extensions/Parenthetical'
 import { Transition } from './extensions/Transition'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useTypewriterScroll } from '@/hooks/useTypewriterScroll'
 import { useUIStore } from '@/store/useUIStore'
 import { Sidebar } from '../ui/Sidebar'
 import { useAudio } from '@/hooks/useAudio'
+import { db } from '@/lib/db'
+import { useAutosave } from '@/hooks/useAutosave'
 
 export default function Editor() {
-    const { setFocusMode, isNightMode } = useUIStore()
+    const { setFocusMode, isNightMode, currentScriptId, setCurrentScriptId, setScriptTitle, setScriptAuthor, scriptTitle, scriptAuthor } = useUIStore()
     const { playClack, playReturn } = useAudio()
     const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-    const [hydrated, setHydrated] = useState(false)
+
 
     // Refs for stable access in Tiptap closures without re-init
     const playReturnRef = useRef(playReturn)
@@ -42,13 +44,8 @@ export default function Editor() {
     }, [playReturn, playClack])
 
     useEffect(() => {
-        setHydrated(true)
         playReturn()
     }, [playReturn])
-
-    // We need to ensure that if the document is created fresh, it starts with an Action block, not Slugline.
-    // Tiptap's `content` prop is used on initialization.
-    // If I want to verify "Capital letters by Default is not good", I need to ensure the first block is Action.
 
     const editor = useEditor({
         immediatelyRender: false,
@@ -89,12 +86,8 @@ export default function Editor() {
                 return false
             }
         },
-        onUpdate: ({ editor }) => {
-            // Persist
-            const json = editor.getJSON()
-            if (typeof window !== 'undefined') {
-                localStorage.setItem('draft_content', JSON.stringify(json))
-            }
+        onUpdate: () => {
+            // We don't persist here manually anymore, useAutosave does it.
         },
         onTransaction: ({ transaction }) => {
             if (transaction.docChanged) {
@@ -135,30 +128,79 @@ export default function Editor() {
         }
     })
 
-    // Load persistence
+    // Initialize DB: Load last script or create new one
     useEffect(() => {
-        if (editor && hydrated) {
-            const stored = localStorage.getItem('draft_content')
-            if (stored) {
-                try {
-                    const json = JSON.parse(stored)
-                    // If stored content is empty or invalid, keep default.
-                    // But check if it has content.
-                    editor.commands.setContent(json)
-                    // We set content but we don't want to trigger the sound.
-                    // Actually, `setContent` triggers a transaction.
-                    // We can't easily pass meta to `setContent` in all Tiptap versions directly as a second arg object?
-                    // Correction: editor.commands.setContent(content, emitUpdate, parseOptions) - doesn't take meta.
-                    // Better approach: Use chain().setContent(json).setMeta('preventSound', true).run()
-                    editor.chain().setContent(json).setMeta('preventSound', true).run()
-                } catch (e) {
-                    // ignore
+        const initDB = async () => {
+            if (currentScriptId) return // Already loaded
+
+            const count = await db.scripts.count()
+            if (count > 0) {
+                const lastScript = await db.scripts.orderBy('updatedAt').last()
+                if (lastScript) {
+                    setCurrentScriptId(lastScript.id)
+                    setScriptTitle(lastScript.title)
+                    setScriptAuthor(lastScript.author)
+                    if (editor && !editor.isDestroyed) {
+                        editor.chain().setContent(lastScript.content).setMeta('preventSound', true).run()
+                    }
                 }
+            } else {
+                // Create default script
+                const id = await db.scripts.add({
+                    title: 'Untitled',
+                    author: '',
+                    content: {
+                        type: 'doc',
+                        content: [{ type: 'action', content: [] }]
+                    },
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                })
+                setCurrentScriptId(id)
+                setScriptTitle('Untitled')
+                setScriptAuthor('')
             }
         }
-    }, [editor, hydrated])
+        initDB()
+    }, [currentScriptId, setCurrentScriptId, setScriptTitle, setScriptAuthor, editor])
 
+    // Load content when switching scripts (if editor exists)
+    useEffect(() => {
+        const loadScript = async () => {
+            if (!editor || !currentScriptId) return
+
+            // Check if we already have the correct content? 
+            // Actually, we should force load if the ID changed.
+            // But we need to avoid overwriting if we just typed?
+            // This is complex. Simplification: Only load if editor content is empty or different?
+            // Better: Trust the DB as source of truth on switch.
+
+            const script = await db.scripts.get(currentScriptId)
+            if (script && script.content) {
+                // simple check to avoid reload loops if we just saved?
+                // For now, unconditional load on ID change is safer for "Switching".
+                // We need to make sure this doesn't run on every render.
+                // It runs when `currentScriptId` changes.
+
+                // We also need to prevent this from overwriting unsaved changes if we switch? 
+                // Architecture assumes autosave is fast enough or we don't switch unsaved.
+                // We will assume autosave handles it.
+
+                // Only set content if it's different to avoid cursor jumps?
+                // Tiptap setContent usually resets cursor.
+                // For this MVP, we assume switching scripts happens rarely and resets view.
+                editor.chain().setContent(script.content).setMeta('preventSound', true).run()
+                setScriptTitle(script.title)
+                setScriptAuthor(script.author)
+            }
+        }
+        loadScript()
+    }, [currentScriptId, editor, setScriptTitle, setScriptAuthor])
+
+
+    useAutosave(editor, currentScriptId)
     useTypewriterScroll(editor)
+
 
     useEffect(() => {
         const handleMouseMove = () => {
@@ -178,6 +220,11 @@ export default function Editor() {
 
     return (
         <div className="min-h-screen w-full bg-cream cursor-text relative" onClick={() => editor.chain().focus().run()}>
+            <div className="print-title-page">
+                <h1 className="font-courier text-4xl font-bold uppercase mb-4 tracking-widest">{scriptTitle || "UNTITLED"}</h1>
+                <p className="font-courier text-xl mb-2">by</p>
+                <p className="font-courier text-xl mb-4">{scriptAuthor || "Author Name"}</p>
+            </div>
             <Sidebar editor={editor} />
             <div className="max-w-[100vw] flex justify-center">
                 <EditorContent editor={editor} className="w-full" />

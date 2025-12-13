@@ -1,4 +1,12 @@
 import '@testing-library/jest-dom'
+import 'fake-indexeddb/auto'
+import { TextEncoder, TextDecoder } from 'util'
+
+Object.assign(global, { TextEncoder, TextDecoder })
+
+if (typeof global.structuredClone === 'undefined') {
+    global.structuredClone = (val) => JSON.parse(JSON.stringify(val))
+}
 
 // Mock Web Audio API
 class AudioContextMock {
@@ -37,9 +45,9 @@ class AudioContextMock {
     }
 }
 
-// @ts-ignore
+// @ts-expect-error Mocking window.AudioContext
 window.AudioContext = AudioContextMock
-// @ts-ignore
+// @ts-expect-error Mocking window.webkitAudioContext
 window.webkitAudioContext = AudioContextMock
 
 // Mock matchMedia
@@ -62,6 +70,13 @@ window.scrollTo = jest.fn()
 
 // Mock ResizeObserver
 global.ResizeObserver = class ResizeObserver {
+    observe() { }
+    unobserve() { }
+    disconnect() { }
+}
+
+// @ts-expect-error Mocking intersection observer
+global.IntersectionObserver = class IntersectionObserver {
     observe() { }
     unobserve() { }
     disconnect() { }

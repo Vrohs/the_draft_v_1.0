@@ -49,7 +49,8 @@ export const Slugline = Node.create({
         return [
             new InputRule({
                 find: /^(?:INT|EXT|EST|INT\.\/EXT|I\/E)\.\s$/i,
-                handler: ({ state, range, match }: { state: any, range: any, match: any }) => {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                handler: ({ state, range }: { state: any, range: any }) => {
                     const { tr } = state
                     const start = range.from
                     const end = range.to

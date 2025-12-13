@@ -1,6 +1,5 @@
 import { Editor } from '@tiptap/core'
 import Document from '@tiptap/extension-document'
-import StarterKit from '@tiptap/starter-kit'
 import Text from '@tiptap/extension-text'
 import History from '@tiptap/extension-history'
 import { Slugline } from '../Slugline'
@@ -88,6 +87,7 @@ describe('Screenplay Extensions', () => {
 
         // Simulate Tab key press since there's no editor.commands.tab()
         // We use the low-level ProseMirror view prop handler
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         editor.view.someProp('handleKeyDown', (f: any) => f(editor.view, new KeyboardEvent('keydown', { key: 'Tab' })))
 
         // Content should now be 'character'
@@ -236,9 +236,8 @@ describe('Screenplay Extensions', () => {
         // Should result in two Dialogue blocks
         const content = editor.getJSON().content
         expect(content?.[0].type).toBe('dialogue')
-        expect((content?.[0].content?.[0] as any).text).toBe('Hello')
-
+        expect((content?.[0].content?.[0] as unknown as { text: string }).text).toBe('Hello')
         expect(content?.[1].type).toBe('dialogue')
-        expect((content?.[1].content?.[0] as any).text).toBe(' world')
+        expect((content?.[1].content?.[0] as unknown as { text: string }).text).toBe(' world')
     })
 })
