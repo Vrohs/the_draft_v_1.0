@@ -11,6 +11,8 @@
     "test:watch": "jest --watch"
   },
   "dependencies": {
+    "@clerk/nextjs": "^6.36.2",
+    "@prisma/client": "^7.1.0",
     "@tiptap/extension-document": "^3.13.0",
     "@tiptap/extension-history": "^3.13.0",
     "@tiptap/extension-text": "^3.13.0",
@@ -44,6 +46,7 @@
     "jest": "^30.2.0",
     "jest-environment-jsdom": "^30.2.0",
     "list": "^2.0.19",
+    "prisma": "^7.1.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5"

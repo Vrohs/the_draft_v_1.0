@@ -1,7 +1,8 @@
-import { render, screen, act } from '@testing-library/react'
+import { render, screen, act, fireEvent } from '@testing-library/react'
 import Editor from '../Editor'
 import { useAudio } from '@/hooks/useAudio'
 import { useEditor } from '@tiptap/react'
+import { useUIStore } from '@/store/useUIStore'
 
 // Mock useAudio hook
 jest.mock('@/hooks/useAudio', () => ({
@@ -10,19 +11,7 @@ jest.mock('@/hooks/useAudio', () => ({
 
 // Mock useUIStore
 jest.mock('@/store/useUIStore', () => ({
-    useUIStore: () => ({
-        setFocusMode: jest.fn(),
-        isFocusMode: false,
-        isInFocusMode: false,
-        isNightMode: false,
-        setIsNightMode: jest.fn(),
-        currentScriptId: null,
-        setCurrentScriptId: jest.fn(),
-        setScriptTitle: jest.fn(),
-        setScriptAuthor: jest.fn(),
-        scriptTitle: 'Untitled',
-        scriptAuthor: 'Author'
-    })
+    useUIStore: jest.fn()
 }))
 
 // Mock useLiveQuery
@@ -88,8 +77,27 @@ describe('Editor Component', () => {
         }
     }
 
+    // Default store state
+    const defaultStoreState = {
+        setFocusMode: jest.fn(),
+        isFocusMode: false,
+        isInFocusMode: false,
+        isNightMode: false,
+        setIsNightMode: jest.fn(),
+        currentScriptId: null,
+        setCurrentScriptId: jest.fn(),
+        setScriptTitle: jest.fn(),
+        setScriptAuthor: jest.fn(),
+        scriptTitle: 'Untitled',
+        scriptAuthor: 'Author',
+        isMobileSidebarOpen: false,
+        toggleMobileSidebar: jest.fn()
+    }
+
     beforeEach(() => {
         jest.clearAllMocks()
+            ; (useUIStore as unknown as jest.Mock).mockReturnValue(defaultStoreState)
+
             ; (useAudio as jest.Mock).mockReturnValue({
                 playClack,
                 playReturn,
@@ -133,12 +141,14 @@ describe('Editor Component', () => {
         // Let's check Editor.tsx implementation.
         // It uses `editor.on('transaction', ...)` or `getConfig`?
         // Step 341 summary: "Added playClack() call within onTransaction".
-
-        // If `useEditor` returns mockEditor.
-        // `Editor.tsx` likely attaches event via `useEffect` if using `editor` instance, 
-        // OR passes `onTransaction` to `useEditor` options.
-
-        // Let's verify `useEditor` is called with `onTransaction` handler if passed in options.
-        // OR if `useEffect` attaches it.
     })
+
+    it('renders mobile menu button', async () => {
+        await act(async () => {
+            render(<Editor />)
+        })
+        expect(screen.getByText('Menu')).toBeInTheDocument()
+    })
+
+
 })

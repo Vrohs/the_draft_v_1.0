@@ -21,6 +21,10 @@ interface UIState {
     setScriptTitle: (title: string) => void
     scriptAuthor: string
     setScriptAuthor: (author: string) => void
+
+    // Mobile Sidebar State
+    isMobileSidebarOpen: boolean
+    toggleMobileSidebar: () => void
 }
 
 export const useUIStore = create<UIState>()(
@@ -42,6 +46,9 @@ export const useUIStore = create<UIState>()(
             setScriptTitle: (title) => set({ scriptTitle: title }),
             scriptAuthor: '',
             setScriptAuthor: (author) => set({ scriptAuthor: author }),
+
+            isMobileSidebarOpen: false,
+            toggleMobileSidebar: () => set((state) => ({ isMobileSidebarOpen: !state.isMobileSidebarOpen })),
         }),
         {
             name: 'the-draft-ui-store',

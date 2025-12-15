@@ -19,7 +19,7 @@ import { db } from '@/lib/db'
 import { useAutosave } from '@/hooks/useAutosave'
 
 export default function Editor() {
-    const { setFocusMode, isNightMode, currentScriptId, setCurrentScriptId, setScriptTitle, setScriptAuthor, scriptTitle, scriptAuthor } = useUIStore()
+    const { setFocusMode, isNightMode, currentScriptId, setCurrentScriptId, setScriptTitle, setScriptAuthor, scriptTitle, scriptAuthor, toggleMobileSidebar } = useUIStore()
     const { playClack, playReturn } = useAudio()
     const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -225,8 +225,19 @@ export default function Editor() {
                 <p className="font-courier text-xl mb-2">by</p>
                 <p className="font-courier text-xl mb-4">{scriptAuthor || "Author Name"}</p>
             </div>
+            {/* Mobile Menu Button */}
+            <div className="fixed top-4 left-4 z-20 md:hidden print:hidden mix-blend-difference">
+                <button
+                    onClick={toggleMobileSidebar}
+                    className="p-2 text-ink/50 hover:text-ink uppercase font-bold text-xs"
+                >
+                    Menu
+                </button>
+            </div>
+
             <Sidebar editor={editor} />
-            <div className="max-w-[100vw] flex justify-center">
+            {/* Added md:pl-64 to push content when sidebar is present (on desktop) */}
+            <div className="max-w-[100vw] flex justify-center md:pl-64 transition-all duration-300">
                 <EditorContent editor={editor} className="w-full" />
             </div>
         </div>

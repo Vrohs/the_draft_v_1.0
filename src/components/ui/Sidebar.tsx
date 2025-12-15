@@ -16,7 +16,8 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
         isNightMode, toggleNightMode,
         isSaving,
         setCurrentScriptId,
-        currentScriptId
+        currentScriptId,
+        isMobileSidebarOpen, toggleMobileSidebar
     } = useUIStore()
     const { playReturn } = useAudio()
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
@@ -77,10 +78,27 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
 
     return (
         <>
+            {/* Mobile Overlay Backdrop */}
+            {isMobileSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black/20 z-20 md:hidden"
+                    onClick={toggleMobileSidebar}
+                />
+            )}
+
             <div className={clsx(
-                "fixed left-0 top-0 h-full w-64 flex flex-col p-8 transition-opacity duration-700 ease-in-out z-10 bg-transparent",
-                isFocusMode ? "opacity-0 pointer-events-none" : "opacity-100"
+                "fixed left-0 top-0 h-full w-64 flex flex-col p-8 transition-all duration-700 ease-in-out z-30",
+                "bg-cream md:bg-transparent shadow-xl md:shadow-none", // Mobile background
+                isFocusMode ? "opacity-0 pointer-events-none" : "opacity-100",
+                // Mobile visibility
+                isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
             )}>
+                {/* Mobile Close Button */}
+                <div className="md:hidden absolute top-4 right-4">
+                    <button onClick={toggleMobileSidebar} className="text-ink/40 hover:text-ink text-xl">
+                        &times;
+                    </button>
+                </div>
 
                 {/* File Manager Section */}
                 <div className="mb-8 border-b border-ink/10 pb-6">
@@ -97,7 +115,10 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
                                     "text-xs font-bold cursor-pointer transition-colors duration-200 flex justify-between items-center group",
                                     currentScriptId === script.id ? "text-ink" : "text-ink/60 hover:text-ink"
                                 )}
-                                onClick={() => handleSwitchScript(script.id)}
+                                onClick={() => {
+                                    handleSwitchScript(script.id)
+                                    if (window.innerWidth < 768) toggleMobileSidebar()
+                                }}
                             >
                                 <span className="truncate max-w-[120px]">{script.title || "UNTITLED"}</span>
                                 <span
@@ -122,6 +143,7 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
                                 className="text-xs font-bold text-ink/60 hover:text-ink cursor-pointer transition-colors duration-200 uppercase leading-snug"
                                 onClick={() => {
                                     playReturn()
+                                    if (window.innerWidth < 768) toggleMobileSidebar()
                                     if (editor) {
                                         const { view } = editor
                                         try {
