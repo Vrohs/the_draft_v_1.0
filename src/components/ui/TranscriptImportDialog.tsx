@@ -63,17 +63,17 @@ export const TranscriptImportDialog = ({ isOpen, onClose, onImport }: Transcript
     if (!isOpen) return null
 
     const inputClass = `w-full p-2 text-sm font-courier border-b-2 outline-none transition-colors ${isNightMode
-            ? 'bg-transparent border-white/20 text-white focus:border-white'
-            : 'bg-transparent border-gray-200 text-gray-900 focus:border-gray-900'
+        ? 'bg-transparent border-white/20 text-white focus:border-white'
+        : 'bg-transparent border-gray-200 text-gray-900 focus:border-gray-900'
         }`
 
     const labelClass = `block text-xs font-bold uppercase mb-2 ${isNightMode ? 'text-white/60' : 'text-gray-500'
         }`
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={(e) => e.stopPropagation()}>
             <div className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 rounded-lg shadow-xl flex flex-col gap-6 custom-scrollbar ${isNightMode ? 'bg-zinc-900 border border-white/10' : 'bg-white'
-                }`}>
+                }`} onClick={(e) => e.stopPropagation()}>
 
                 {/* Header */}
                 <div className="flex justify-between items-center">

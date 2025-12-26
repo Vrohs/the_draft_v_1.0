@@ -31,8 +31,8 @@ export const SettingsDialog = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
     if (!isOpen) return null
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className={`w-96 p-8 rounded-lg shadow-xl ${isNightMode ? 'bg-zinc-900 border border-white/10' : 'bg-white'}`}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={(e) => e.stopPropagation()}>
+            <div className={`w-96 p-8 rounded-lg shadow-xl ${isNightMode ? 'bg-zinc-900 border border-white/10' : 'bg-white'}`} onClick={(e) => e.stopPropagation()}>
                 <h2 className={`text-sm font-bold uppercase tracking-widest mb-6 ${isNightMode ? 'text-white' : 'text-gray-900'}`}>
                     Script Settings
                 </h2>
