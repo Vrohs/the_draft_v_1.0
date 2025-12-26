@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { useAudio } from '@/hooks/useAudio'
 import { useState } from 'react'
 import { SettingsDialog } from './SettingsDialog'
+import { TranscriptImportDialog } from './TranscriptImportDialog'
 import { db } from '@/lib/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 
@@ -21,6 +22,7 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
     } = useUIStore()
     const { playReturn } = useAudio()
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+    const [isTranscriptOpen, setIsTranscriptOpen] = useState(false)
 
     // Fetch all scripts for file manager
     const scripts = useLiveQuery(() => db.scripts.orderBy('updatedAt').reverse().toArray())
@@ -191,10 +193,22 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
                     <button onClick={handleJSON} className="text-xs font-bold text-ink/50 hover:text-ink uppercase flex items-center gap-2">
                         Export JSON
                     </button>
+                    <button onClick={() => setIsTranscriptOpen(true)} className="text-xs font-bold text-ink/50 hover:text-ink uppercase flex items-center gap-2">
+                        Import Transcript
+                    </button>
                 </div>
             </div>
 
             <SettingsDialog isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} key={currentScriptId} />
+            <TranscriptImportDialog
+                isOpen={isTranscriptOpen}
+                onClose={() => setIsTranscriptOpen(false)}
+                onImport={(json) => {
+                    if (editor) {
+                        editor.commands.insertContent(json)
+                    }
+                }}
+            />
         </>
     )
 }
