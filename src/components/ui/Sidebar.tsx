@@ -6,6 +6,8 @@ import { useAudio } from '@/hooks/useAudio'
 import { useState } from 'react'
 import { SettingsDialog } from './SettingsDialog'
 import { TranscriptImportDialog } from './TranscriptImportDialog'
+import { ThemeSelector } from './ThemeSelector'
+import { AmbientPlayer } from './AmbientPlayer'
 import { db } from '@/lib/db'
 import { useLiveQuery } from 'dexie-react-hooks'
 
@@ -15,6 +17,8 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
         isFocusMode,
         isSoundEnabled, toggleSound,
         isNightMode, toggleNightMode,
+        isWordFocusMode, toggleWordFocus,
+        isReflectionMode, toggleReflectionMode,
         isSaving,
         setCurrentScriptId,
         currentScriptId,
@@ -24,7 +28,6 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false)
     const [isTranscriptOpen, setIsTranscriptOpen] = useState(false)
 
-    // Fetch all scripts for file manager
     const scripts = useLiveQuery(() => db.scripts.orderBy('updatedAt').reverse().toArray())
 
     const handleNewScript = async () => {
@@ -51,7 +54,6 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
         if (confirm('Are you sure you want to delete this script?')) {
             await db.scripts.delete(id)
             if (currentScriptId === id) {
-                // If deleted current, switch to another or create new
                 const remaining = await db.scripts.orderBy('updatedAt').last()
                 if (remaining) {
                     setCurrentScriptId(remaining.id)
@@ -80,7 +82,6 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
 
     return (
         <>
-            {/* Mobile Overlay Backdrop */}
             {isMobileSidebarOpen && (
                 <div
                     className="fixed inset-0 bg-black/20 z-20 md:hidden"
@@ -90,19 +91,16 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
 
             <div className={clsx(
                 "fixed left-0 top-0 h-full w-64 flex flex-col p-8 transition-all duration-700 ease-in-out z-30",
-                "bg-cream md:bg-transparent shadow-xl md:shadow-none", // Mobile background
+                "bg-cream md:bg-transparent shadow-xl md:shadow-none",
                 isFocusMode ? "opacity-0 pointer-events-none" : "opacity-100",
-                // Mobile visibility
                 isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
             )}>
-                {/* Mobile Close Button */}
                 <div className="md:hidden absolute top-4 right-4">
                     <button onClick={toggleMobileSidebar} className="text-ink/40 hover:text-ink text-xl">
                         &times;
                     </button>
                 </div>
 
-                {/* File Manager Section */}
                 <div className="mb-8 border-b border-ink/10 pb-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="font-bold text-xs tracking-widest text-ink/40 uppercase font-sans">Scripts</h2>
@@ -134,7 +132,6 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
                     </ul>
                 </div>
 
-                {/* Scene Strip Section */}
                 <h2 className="font-bold mb-6 text-xs tracking-widest text-ink/40 uppercase font-sans">Scene Strip</h2>
 
                 <div className="flex-1 overflow-y-auto mb-6 custom-scrollbar pr-2">
@@ -187,6 +184,28 @@ export const Sidebar = ({ editor }: { editor: Editor | null }) => {
                     <button onClick={toggleNightMode} className="text-xs font-bold text-ink/50 hover:text-ink uppercase flex items-center gap-2">
                         {isNightMode ? 'Mode: Night' : 'Mode: Day'}
                     </button>
+                    <button onClick={toggleWordFocus} className="text-xs font-bold text-ink/50 hover:text-ink uppercase flex items-center gap-2">
+                        {isWordFocusMode ? 'Privacy: Word' : 'Privacy: Off'}
+                    </button>
+
+                    <button
+                        onClick={toggleReflectionMode}
+                        className={clsx(
+                            "text-xs font-bold uppercase flex items-center gap-2 transition-colors",
+                            isReflectionMode
+                                ? "text-ink"
+                                : "text-ink/50 hover:text-ink"
+                        )}
+                    >
+                        {isReflectionMode ? '✨ Reflection Mode' : 'Reflection Mode'}
+                    </button>
+
+                    <div className="pt-2">
+                        <ThemeSelector />
+                    </div>
+
+                    <AmbientPlayer />
+
                     <button onClick={handlePDF} className="text-xs font-bold text-ink/50 hover:text-ink uppercase flex items-center gap-2">
                         Export PDF
                     </button>

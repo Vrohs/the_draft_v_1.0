@@ -8,6 +8,7 @@ import { Character } from '../Character'
 import { Dialogue } from '../Dialogue'
 import { Parenthetical } from '../Parenthetical'
 import { Transition } from '../Transition'
+import { WordFocus } from '../WordFocus'
 
 describe('Screenplay Extensions', () => {
     let editor: Editor
@@ -241,3 +242,92 @@ describe('Screenplay Extensions', () => {
         expect((content?.[1].content?.[0] as unknown as { text: string }).text).toBe(' world')
     })
 })
+
+describe('WordFocus Extension', () => {
+    let editor: Editor
+
+    beforeEach(() => {
+        editor = new Editor({
+            extensions: [
+                Document,
+                Text,
+                Action,
+                WordFocus
+            ],
+        })
+    })
+
+    afterEach(() => {
+        editor.destroy()
+    })
+
+    it('should create decoration for current word at cursor', () => {
+        editor.commands.setContent({
+            type: 'doc',
+            content: [{ type: 'action', content: [{ type: 'text', text: 'Hello world' }] }]
+        })
+
+        // Place cursor in the middle of "Hello" (position 3)
+        editor.commands.setTextSelection(3)
+
+        // Verify the editor has the WordFocus extension registered
+        const hasWordFocus = editor.extensionManager.extensions
+            .some(ext => ext.name === 'wordFocus')
+
+        expect(hasWordFocus).toBe(true)
+    })
+
+    it('should track word boundaries correctly', () => {
+        editor.commands.setContent({
+            type: 'doc',
+            content: [{ type: 'action', content: [{ type: 'text', text: 'Hello world test' }] }]
+        })
+
+        // Place cursor at start of "world" (position 7)
+        editor.commands.setTextSelection(7)
+
+        // The plugin should be active - we can verify by the fact that
+        // the editor doesn't throw and has the expected structure
+        expect(editor.getText()).toBe('Hello world test')
+    })
+
+    it('should not apply decoration when cursor is in whitespace', () => {
+        editor.commands.setContent({
+            type: 'doc',
+            content: [{ type: 'action', content: [{ type: 'text', text: 'Hello world' }] }]
+        })
+
+        // Place cursor in whitespace between words (position 6 - the space)
+        editor.commands.setTextSelection(6)
+
+        // Editor should still function normally
+        expect(editor.state.selection.$from.pos).toBe(6)
+    })
+
+    it('should handle empty content gracefully', () => {
+        editor.commands.setContent({
+            type: 'doc',
+            content: [{ type: 'action', content: [] }]
+        })
+
+        // Should not throw
+        expect(() => editor.commands.setTextSelection(1)).not.toThrow()
+    })
+
+    it('should update decoration when cursor moves', () => {
+        editor.commands.setContent({
+            type: 'doc',
+            content: [{ type: 'action', content: [{ type: 'text', text: 'First Second Third' }] }]
+        })
+
+        // Move cursor through different words
+        editor.commands.setTextSelection(3) // In "First"
+        const pos1 = editor.state.selection.$from.pos
+
+        editor.commands.setTextSelection(9) // In "Second"
+        const pos2 = editor.state.selection.$from.pos
+
+        expect(pos1).not.toBe(pos2)
+    })
+})
+

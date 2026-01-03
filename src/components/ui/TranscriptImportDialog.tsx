@@ -1,4 +1,3 @@
-
 import { useState } from 'react'
 import { useUIStore } from '@/store/useUIStore'
 import { parseTranscript, SceneDetails, CharacterMap } from '@/lib/transcriptParser'
@@ -13,15 +12,12 @@ interface TranscriptImportDialogProps {
 export const TranscriptImportDialog = ({ isOpen, onClose, onImport }: TranscriptImportDialogProps) => {
     const { isNightMode } = useUIStore()
 
-    // Scene Details State
     const [intExt, setIntExt] = useState<'INT.' | 'EXT.'>('INT.')
     const [location, setLocation] = useState('')
     const [time, setTime] = useState<'DAY' | 'NIGHT'>('DAY')
 
-    // Transcript State
     const [transcript, setTranscript] = useState('')
 
-    // Character Map State
     const [characterMap, setCharacterMap] = useState<{ from: string, to: string }[]>([
         { from: '', to: '' }
     ])
@@ -37,7 +33,6 @@ export const TranscriptImportDialog = ({ isOpen, onClose, onImport }: Transcript
     }
 
     const handleImportClick = () => {
-        // Construct map object
         const mapObj: CharacterMap = {}
         characterMap.forEach(row => {
             if (row.from && row.to) {
@@ -55,7 +50,6 @@ export const TranscriptImportDialog = ({ isOpen, onClose, onImport }: Transcript
         onImport(json)
         onClose()
 
-        // Reset sensitive fields
         setTranscript('')
         setLocation('')
     }
@@ -75,7 +69,6 @@ export const TranscriptImportDialog = ({ isOpen, onClose, onImport }: Transcript
             <div className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto p-8 rounded-lg shadow-xl flex flex-col gap-6 custom-scrollbar ${isNightMode ? 'bg-zinc-900 border border-white/10' : 'bg-white'
                 }`} onClick={(e) => e.stopPropagation()}>
 
-                {/* Header */}
                 <div className="flex justify-between items-center">
                     <h2 className={`text-sm font-bold uppercase tracking-widest ${isNightMode ? 'text-white' : 'text-gray-900'}`}>
                         Import Transcript
@@ -86,9 +79,7 @@ export const TranscriptImportDialog = ({ isOpen, onClose, onImport }: Transcript
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* LEFT COLUMN: Scene & Map */}
                     <div className="space-y-6">
-                        {/* Scene Heading */}
                         <div className="space-y-4 border-b border-gray-200/10 pb-4">
                             <h3 className={`text-xs font-bold uppercase tracking-wider ${isNightMode ? 'text-white/40' : 'text-gray-400'}`}>1. Scene Heading</h3>
                             <div className="grid grid-cols-4 gap-2">
@@ -124,7 +115,6 @@ export const TranscriptImportDialog = ({ isOpen, onClose, onImport }: Transcript
                             </div>
                         </div>
 
-                        {/* Character Map */}
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
                                 <h3 className={`text-xs font-bold uppercase tracking-wider ${isNightMode ? 'text-white/40' : 'text-gray-400'}`}>2. Character Mapping</h3>
@@ -156,7 +146,6 @@ export const TranscriptImportDialog = ({ isOpen, onClose, onImport }: Transcript
                         </div>
                     </div>
 
-                    {/* RIGHT COLUMN: Transcript Input */}
                     <div className="flex flex-col h-full min-h-[300px]">
                         <h3 className={`text-xs font-bold uppercase tracking-wider mb-4 ${isNightMode ? 'text-white/40' : 'text-gray-400'}`}>3. Paste Transcript</h3>
                         <textarea
@@ -172,7 +161,6 @@ export const TranscriptImportDialog = ({ isOpen, onClose, onImport }: Transcript
                     </div>
                 </div>
 
-                {/* Footer */}
                 <div className="flex justify-end gap-4 border-t border-gray-200/10 pt-6">
                     <button
                         onClick={onClose}

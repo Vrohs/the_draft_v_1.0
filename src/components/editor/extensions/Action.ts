@@ -3,7 +3,7 @@ import { Node, mergeAttributes } from "@tiptap/core";
 export const Action = Node.create({
     name: "action",
 
-    priority: 2000, // Highest priority to ensure it's the default block
+    priority: 2000,
 
     group: "block",
 
@@ -22,7 +22,6 @@ export const Action = Node.create({
     addKeyboardShortcuts() {
         return {
             Tab: () => {
-                // Transform to Character
                 return this.editor.commands.setNode("character");
             },
         };

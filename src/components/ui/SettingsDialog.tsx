@@ -10,7 +10,6 @@ export const SettingsDialog = ({ isOpen, onClose }: { isOpen: boolean, onClose: 
         isNightMode
     } = useUIStore()
 
-    // Initial state from props (updated via key change in parent)
     const [title, setTitle] = useState(scriptTitle)
     const [author, setAuthor] = useState(scriptAuthor)
 

@@ -40,8 +40,6 @@ export const Character = Node.create({
                 return false;
             },
             Tab: () => {
-                // Maybe Tab moves back to Action? Or Transition?
-                // PRD doesn't specify reverse.
                 return false;
             }
         };

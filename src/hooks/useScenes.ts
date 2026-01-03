@@ -14,9 +14,6 @@ export const useScenes = (editor: Editor | null) => {
                     newScenes.push({ text: node.textContent, pos })
                 }
             })
-            // Check if scenes changed to avoid unnecessary re-renders?
-            // JSON.stringify comparison is heavy but safe for small lists.
-            // For now, React handles state updates efficiently.
             setScenes(newScenes)
         }
 

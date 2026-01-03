@@ -5,7 +5,7 @@ interface Script {
     id: number;
     title: string;
     author: string;
-    content: JSONContent; // JSON content from Tiptap
+    content: JSONContent;
     updatedAt: Date;
     createdAt: Date;
 }
@@ -13,13 +13,12 @@ interface Script {
 const db = new Dexie('ScreenplayDB') as Dexie & {
     scripts: EntityTable<
         Script,
-        'id' // primary key "id" (for the typings only)
+        'id'
     >;
 };
 
-// Schema declaration:
 db.version(1).stores({
-    scripts: '++id, title, author, updatedAt, createdAt' // primary key "id" (for the runtime!)
+    scripts: '++id, title, author, updatedAt, createdAt'
 });
 
 export type { Script };

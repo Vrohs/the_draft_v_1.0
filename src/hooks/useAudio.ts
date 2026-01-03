@@ -1,7 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { useUIStore } from '@/store/useUIStore'
 
-// Singleton State
 let audioContext: AudioContext | null = null
 let buffers: { [key: string]: AudioBuffer } = {}
 let initPromise: Promise<void> | null = null
@@ -92,7 +91,7 @@ export const useAudio = () => {
 
     const startSlide = useCallback(() => {
         if (!isSoundEnabled || !audioContext || !buffers.slide) return
-        if (activeSlideSource) return // Global slide already playing
+        if (activeSlideSource) return
 
         const ctx = audioContext
         if (ctx.state === 'suspended') ctx.resume().catch(() => { })
@@ -111,9 +110,6 @@ export const useAudio = () => {
 
         source.start(0, 2.0)
         activeSlideSource = source
-
-        // Safeguard: stop after 5 seconds max if something goes wrong with stopSlide
-        // (Optional, maybe annoying if scrolling long? Let's relying on stopSlide)
     }, [isSoundEnabled])
 
     const stopSlide = useCallback(() => {
@@ -121,7 +117,6 @@ export const useAudio = () => {
             try {
                 activeSlideSource.stop()
             } catch {
-                // ignore
             }
             activeSlideSource = null
         }

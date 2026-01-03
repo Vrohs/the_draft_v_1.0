@@ -7,7 +7,6 @@ export const useAutosave = (editor: Editor | null, scriptId: number | null) => {
     const { setIsSaving } = useUIStore()
     const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-    // Modification: Ref to access latest editor state in cleanup/listeners
     const editorRef = useRef(editor)
     const scriptIdRef = useRef(scriptId)
 
@@ -56,7 +55,6 @@ export const useAutosave = (editor: Editor | null, scriptId: number | null) => {
         return () => {
             editor.off('update', handleUpdate)
             window.removeEventListener('beforeunload', handleBeforeUnload)
-            // Flush on unmount
             if (timeoutRef.current) {
                 clearTimeout(timeoutRef.current)
                 save()
